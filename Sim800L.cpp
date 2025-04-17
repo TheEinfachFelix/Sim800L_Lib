@@ -29,7 +29,7 @@ void Sim800L::begin(uint32_t baud)
     pinMode(RESET_PIN, OUTPUT);
 
     _baud = baud;
-    SimSerial.begin(_baud, RX_PIN, TX_PIN);
+    SimSerial.begin(_baud, SERIAL_8N1, RX_PIN, TX_PIN);
 
     _sleepMode = 0;
     _functionalityMode = 1;
@@ -39,10 +39,7 @@ void Sim800L::begin(uint32_t baud)
     _buffer.reserve(BUFFER_RESERVE_MEMORY); // Reserve memory to prevent intern fragmention
 }
 
-void Sim800L::print(String str)
-{
-    SimSerial.print(str);
-}
+
 
 
 /*
@@ -128,9 +125,9 @@ String Sim800L::ping()
 bool Sim800L::setPIN(String pin)
 {
     String command;
-    command  = "AT+CPIN=";
+    command  = "AT+CPIN=\"";
     command += pin;
-    command += "\r";
+    command += "\"\r";
 
     // Can take up to 5 seconds
 
@@ -612,7 +609,15 @@ bool Sim800L::updateRtc(int utc)
 
 }
 
-
+void Sim800L::print(String str)
+{
+    if (Debug)
+    {
+        Serial.println("<Sim800L Debug Send: {" + str + "}>S");
+    }
+    SimSerial.print(str);
+    SimSerial.flush();
+}
 
 //
 //PRIVATE METHODS
@@ -643,8 +648,10 @@ String Sim800L::_readSerial(uint32_t timeout)
     }
     if (Debug)
     {
-        Serial.println("<Sim800L Debug Recieved: " + str+ ">");
+        Serial.println("<Sim800L Debug Recieved: {" + str+ "}>R");
     }
+
+    SimSerial.flush();
     return str;
 
 }

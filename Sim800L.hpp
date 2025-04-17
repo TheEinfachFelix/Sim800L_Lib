@@ -19,7 +19,7 @@
 class Sim800L
 {
 private:
-    HardwareSerial SimSerial = Serial1;
+    HardwareSerial SimSerial = Serial2;
     void print(String str);
 
 
